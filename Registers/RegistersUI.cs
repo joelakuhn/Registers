@@ -6,16 +6,16 @@ using Utilities;
 
 namespace Registers
 {
-    public partial class Registers : Form
+    public partial class RegistersUI : Form
     {
-        readonly Dictionary<Keys, Tuple<string, object>> _registers = new Dictionary<Keys, Tuple<string, object>>();
+        readonly Dictionary<Keys, ClipboardData> _registers = new Dictionary<Keys, ClipboardData>();
         Keys _currentRegister = Keys.D1;
-        readonly List<Tuple<string, object>> _queue = new List<Tuple<string, object>>();
+        readonly List<ClipboardData> _queue = new List<ClipboardData>();
         private int _queueInd;
         private bool _isQueueMode;
         readonly List<Combination> _combinations = new List<Combination>(); 
 
-        public Registers()
+        public RegistersUI()
         {
             InitializeComponent();
             for (var dKey = Keys.D0; dKey <= Keys.D9; dKey++)
@@ -49,14 +49,15 @@ namespace Registers
 
         public void QueueLines(List<Keys> keys)
         {
+            _queue.Clear();
             var clipData = GetClip();
-            if (clipData != null && clipData.Item2 is string)
+            if (clipData != null && clipData.Objects.Any(kvp => kvp.Value is string))
             {
-                _queue.Clear();
-                var lines = ((string) clipData.Item2).Replace("\r\n", "\n").Split('\n');
+                var stringData = (string)clipData.Objects.First(kvp => kvp.Value is string).Value;
+                var lines = stringData.Replace("\r\n", "\n").Split('\n');
                 foreach (var line in lines)
                 {
-                    _queue.Add(new Tuple<string, object>(DataFormats.StringFormat, line));
+                    _queue.Add(new ClipboardData(DataFormats.StringFormat, line));
                 }
                 _queueInd = 0;
                 _isQueueMode = true;
@@ -138,27 +139,22 @@ namespace Registers
             Invoke(invoker);
         }
 
-        Tuple<string, object> GetClip()
+        ClipboardData GetClip()
         {
             var dataObject = Clipboard.GetDataObject();
-            if (dataObject != null)
-            {
-                var dataFormats = dataObject.GetFormats();
-                if (dataFormats.Length != 0)
-                {
-                    var dataFormat = dataFormats.Last();
-                    var dataValue = dataObject.GetData(dataFormat);
-                    return new Tuple<string, object>(dataFormat, dataValue);
-                }
-            }
-            return null;
+            if (dataObject == null) return null;
+            return new ClipboardData(dataObject);
         }
 
-        void SetClip(Tuple<string, object> clipData)
+        void SetClip(ClipboardData clipData)
         {
             try
             {
-                Clipboard.SetData(clipData.Item1, clipData.Item2);
+                Clipboard.Clear();
+                foreach (var kvp in clipData.Objects)
+                {
+                    Clipboard.SetData(kvp.Key, kvp.Value);
+                }
             }
             catch (Exception e)
             {

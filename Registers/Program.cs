@@ -42,10 +42,10 @@ namespace Registers
         static void Main()
         {
             if (IsAlreadyRunning()) return;
-            ShowConsoleWindow();
+            //ShowConsoleWindow();
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Registers());
+            Application.Run(new RegistersUI());
         }
     }
 }

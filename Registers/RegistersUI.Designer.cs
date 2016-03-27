@@ -1,6 +1,6 @@
 ﻿namespace Registers
 {
-    partial class Registers
+    partial class RegistersUI
     {
         /// <summary>
         /// Required designer variable.
@@ -36,8 +36,6 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(619, 261);
             this.Name = "Registers";
-            this.ShowIcon = false;
-            this.ShowInTaskbar = false;
             this.Text = "Registers Window";
             this.ResumeLayout(false);
 

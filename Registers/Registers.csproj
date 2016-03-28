@@ -42,8 +42,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ClipboardData.cs" />
-    <Compile Include="Combination.cs" />
+    <Compile Include="CombinationMonitor.cs" />
+    <Compile Include="KeyboardMonitor.cs" />
+    <Compile Include="KeyCombination.cs" />
     <Compile Include="KeyHooks.cs" />
+    <Compile Include="Registers.cs" />
     <Compile Include="RegistersUI.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -53,6 +56,7 @@
     <Compile Include="GlobalKeyboardHook.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="WildcardKeyCombination.cs" />
     <EmbeddedResource Include="RegistersUI.resx">
       <DependentUpon>RegistersUI.cs</DependentUpon>
     </EmbeddedResource>
@@ -64,7 +68,9 @@
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
     </Compile>
+    <None Include="Properties\Instructions.rtf" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

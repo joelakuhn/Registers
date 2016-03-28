@@ -8,7 +8,7 @@ namespace Utilities {
 	/// <summary>
 	/// A class that manages a global low level keyboard hook
 	/// </summary>
-	class globalKeyboardHook {
+	class GlobalKeyboardHook {
 		#region Constant, Structure and Delegate Definitions
 		/// <summary>
 		/// defines the callback type for the hook
@@ -38,7 +38,7 @@ namespace Utilities {
 		/// <summary>
 		/// Handle to the hook, need this to unhook and call the next hook
 		/// </summary>
-		IntPtr hhook = IntPtr.Zero;
+		IntPtr windowHooksReference = IntPtr.Zero;
 		#endregion
 
 		#region Events
@@ -54,18 +54,18 @@ namespace Utilities {
 
 		#region Constructors and Destructors
 		/// <summary>
-		/// Initializes a new instance of the <see cref="globalKeyboardHook"/> class and installs the keyboard hook.
+		/// Initializes a new instance of the <see cref="GlobalKeyboardHook"/> class and installs the keyboard hook.
 		/// </summary>
-		public globalKeyboardHook() {
-			hook();
+		public GlobalKeyboardHook() {
+			Hook();
 		}
 
 		/// <summary>
 		/// Releases unmanaged resources and performs other cleanup operations before the
-		/// <see cref="globalKeyboardHook"/> is reclaimed by garbage collection and uninstalls the keyboard hook.
+		/// <see cref="GlobalKeyboardHook"/> is reclaimed by garbage collection and uninstalls the keyboard hook.
 		/// </summary>
-		~globalKeyboardHook() {
-			unhook();
+		~GlobalKeyboardHook() {
+			Unhook();
 		}
 		#endregion
 
@@ -73,16 +73,16 @@ namespace Utilities {
 		/// <summary>
 		/// Installs the global hook
 		/// </summary>
-		public void hook() {
-			IntPtr hInstance = LoadLibrary("User32");
-			hhook = SetWindowsHookEx(WH_KEYBOARD_LL, hookProc, hInstance, 0);
+		public void Hook() {
+			var user32Ref = LoadLibrary("User32");
+			windowHooksReference = SetWindowsHookEx(WH_KEYBOARD_LL, HookProc, user32Ref, 0);
 		}
 
 		/// <summary>
 		/// Uninstalls the global hook
 		/// </summary>
-		public void unhook() {
-			UnhookWindowsHookEx(hhook);
+		public void Unhook() {
+			UnhookWindowsHookEx(windowHooksReference);
 		}
 
 		/// <summary>
@@ -92,22 +92,22 @@ namespace Utilities {
 		/// <param name="wParam">The event type</param>
 		/// <param name="lParam">The keyhook event information</param>
 		/// <returns></returns>
-		public int hookProc(int code, int wParam, ref keyboardHookStruct lParam) {
+		public int HookProc(int code, int wParam, ref keyboardHookStruct lParam) {
 			if (code >= 0) {
-				Keys key = (Keys)lParam.vkCode;
-                //Console.WriteLine((int)key);
-				if (HookedKeys.Contains(key)) {
-					KeyEventArgs kea = new KeyEventArgs(key);
-					if ((wParam == WM_KEYDOWN || wParam == WM_SYSKEYDOWN) && (KeyDown != null)) {
-						KeyDown(this, kea) ;
-					} else if ((wParam == WM_KEYUP || wParam == WM_SYSKEYUP) && (KeyUp != null)) {
-						KeyUp(this, kea);
-					}
-					if (kea.Handled)
-						return 1;
-				}
+				var key = (Keys)lParam.vkCode;
+                var kea = new KeyEventArgs(key);
+                if ((wParam == WM_KEYDOWN || wParam == WM_SYSKEYDOWN) && (KeyDown != null))
+                {
+                    KeyDown(this, kea) ;
+                }
+                else if ((wParam == WM_KEYUP || wParam == WM_SYSKEYUP) && (KeyUp != null))
+                {
+                    KeyUp(this, kea);
+                }
+                if (kea.Handled)
+                    return 1;
 			}
-			return CallNextHookEx(hhook, code, wParam, ref lParam);
+			return CallNextHookEx(windowHooksReference, code, wParam, ref lParam);
 		}
 		#endregion
 
